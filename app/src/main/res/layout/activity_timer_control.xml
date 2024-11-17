@@ -1,0 +1,42 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:gravity="center">
+
+    <!-- Start Time Picker -->
+    <TimePicker
+        android:id="@+id/start_time_picker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:timePickerMode="spinner" />
+
+    <!-- End Time Picker -->
+    <TimePicker
+        android:id="@+id/end_time_picker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:timePickerMode="spinner" />
+
+    <!-- Button to Submit the Schedule -->
+    <Button
+        android:id="@+id/btn_submit_schedule"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Submit Schedule"
+        android:padding="16dp"
+        android:textSize="16sp"
+        android:layout_marginTop="20dp"/>
+
+    <!-- Error Message TextView (initially invisible) -->
+    <TextView
+        android:id="@+id/error_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start time cannot be later than end time."
+        android:textColor="#FF0000"
+        android:visibility="gone"
+        android:layout_marginTop="10dp"/>
+
+</LinearLayout>

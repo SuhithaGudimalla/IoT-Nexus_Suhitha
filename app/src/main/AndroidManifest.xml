@@ -21,6 +21,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <!-- Declare TimerControlActivity here -->
+        <activity android:name=".TimerControlActivity">
+            <!-- You can also specify intent filters here if needed -->
+        </activity>
     </application>
 
 </manifest>
