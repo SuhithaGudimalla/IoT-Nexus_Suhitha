@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "19005805689",
+    "project_id": "iot-nexus-681ca",
+    "storage_bucket": "iot-nexus-681ca.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:19005805689:android:ebcdf9f1974e882f00f0a8",
+        "android_client_info": {
+          "package_name": "com.suhitha.iotnexus"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAvXuey7SHwSG9lel_daH7blxyexCgeef4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
