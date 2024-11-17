@@ -98,25 +98,20 @@ public class MainActivity extends AppCompatActivity {
 
     // Read real-time data from Firebase
     private void readFromDatabase() {
-        databaseReference.child("device_schedule").child("device_1").addValueEventListener(new com.google.firebase.database.ValueEventListener() {
+        databaseReference.child("devices").child("device_1").addValueEventListener(new com.google.firebase.database.ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    DeviceSchedule schedule = snapshot.getValue(DeviceSchedule.class);
-                    if (schedule != null) {
-                        int startHour = schedule.startHour;
-                        int startMinute = schedule.startMinute;
-                        int endHour = schedule.endHour;
-                        int endMinute = schedule.endMinute;
-
-                        // Update device status TextView or log the schedule
-                        deviceStatus.setText(String.format("Schedule: Start - %02d:%02d, End - %02d:%02d",
-                                startHour, startMinute, endHour, endMinute));
+                    Device device = snapshot.getValue(Device.class);
+                    if (device != null) {
+                        // Update device status based on Firebase value
+                        String state = device.state;
+                        deviceStatus.setText("Device State: " + state);
                     } else {
-                        deviceStatus.setText("No schedule data found.");
+                        deviceStatus.setText("No device data found.");
                     }
                 } else {
-                    deviceStatus.setText("No data available.");
+                    deviceStatus.setText("No device data available.");
                 }
             }
 

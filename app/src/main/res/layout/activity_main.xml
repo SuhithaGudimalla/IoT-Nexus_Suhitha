@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -5,14 +6,14 @@
     android:padding="16dp"
     android:gravity="center">
 
-    <!-- Existing UI elements here, for example a device status label -->
+    <!-- Device Status Label -->
     <TextView
         android:id="@+id/device_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Device is Off"
+        android:text="Device State: OFF"
         android:textSize="18sp"
-        android:layout_marginBottom="30dp"/>
+        android:layout_marginTop="20dp" />
 
     <!-- Button to open TimerControlActivity -->
     <Button
@@ -22,6 +23,6 @@
         android:text="Set Device Schedule"
         android:padding="16dp"
         android:textSize="16sp"
-        android:layout_marginTop="20dp"/>
+        android:layout_marginTop="20dp" />
 
 </LinearLayout>

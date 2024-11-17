@@ -50,8 +50,12 @@ public class TimerControlActivity extends AppCompatActivity {
 
                 // Show success message
                 Toast.makeText(TimerControlActivity.this, "Schedule saved successfully!", Toast.LENGTH_SHORT).show();
+
+                // Navigate back to MainActivity (Home page)
+                finish();  // This will close the current activity and return to MainActivity
             }
         });
+
     }
 
     // DeviceSchedule class to hold the timer data
