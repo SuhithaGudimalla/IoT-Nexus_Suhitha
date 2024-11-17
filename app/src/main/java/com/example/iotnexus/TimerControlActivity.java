@@ -3,67 +3,73 @@ package com.example.iotnexus;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
-import android.widget.TimePicker;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 public class TimerControlActivity extends AppCompatActivity {
 
-    private TimePicker startTimePicker;
-    private TimePicker endTimePicker;
-    private Button btnSubmitSchedule;
-    private TextView errorMessage;
+    private EditText edtStartHour, edtStartMinute, edtEndHour, edtEndMinute;
+    private Button btnSubmit;
+    private DatabaseReference databaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timer_control);
 
-        // Initialize the UI components
-        startTimePicker = findViewById(R.id.start_time_picker);
-        endTimePicker = findViewById(R.id.end_time_picker);
-        btnSubmitSchedule = findViewById(R.id.btn_submit_schedule);
-        errorMessage = findViewById(R.id.error_message);
+        // Initialize views
+        edtStartHour = findViewById(R.id.edt_start_hour);
+        edtStartMinute = findViewById(R.id.edt_start_minute);
+        edtEndHour = findViewById(R.id.edt_end_hour);
+        edtEndMinute = findViewById(R.id.edt_end_minute);
+        btnSubmit = findViewById(R.id.btn_submit);
 
-        // Set onClick listener for the submit button
-        btnSubmitSchedule.setOnClickListener(new View.OnClickListener() {
+        // Initialize Firebase reference
+        databaseReference = FirebaseDatabase.getInstance().getReference("device_schedule");
+
+        // Set up the submit button listener
+        btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                validateAndSubmitSchedule();
+                // Get user inputs
+                int startHour = Integer.parseInt(edtStartHour.getText().toString());
+                int startMinute = Integer.parseInt(edtStartMinute.getText().toString());
+                int endHour = Integer.parseInt(edtEndHour.getText().toString());
+                int endMinute = Integer.parseInt(edtEndMinute.getText().toString());
+
+                // Create a new DeviceSchedule object
+                DeviceSchedule schedule = new DeviceSchedule(startHour, startMinute, endHour, endMinute);
+
+                // Store the schedule in Firebase under the device ID (e.g., "device_1")
+                databaseReference.child("device_1").setValue(schedule);
+
+                // Show success message
+                Toast.makeText(TimerControlActivity.this, "Schedule saved successfully!", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    // Validate start time and end time
-    private void validateAndSubmitSchedule() {
-        int startHour = startTimePicker.getHour();
-        int startMinute = startTimePicker.getMinute();
-        int endHour = endTimePicker.getHour();
-        int endMinute = endTimePicker.getMinute();
+    // DeviceSchedule class to hold the timer data
+    public static class DeviceSchedule {
+        public int startHour;
+        public int startMinute;
+        public int endHour;
+        public int endMinute;
 
-        // Check if the start time is later than the end time
-        if (isStartTimeAfterEndTime(startHour, startMinute, endHour, endMinute)) {
-            errorMessage.setVisibility(View.VISIBLE);  // Show error message
-        } else {
-            errorMessage.setVisibility(View.GONE);  // Hide error message
-            // Proceed with saving the schedule
-            saveSchedule(startHour, startMinute, endHour, endMinute);
-            Toast.makeText(TimerControlActivity.this, "Schedule Saved", Toast.LENGTH_SHORT).show();
+        public DeviceSchedule() {
+            // Default constructor required for Firebase
         }
-    }
 
-    // Check if start time is after end time
-    private boolean isStartTimeAfterEndTime(int startHour, int startMinute, int endHour, int endMinute) {
-        // Compare times as minutes of the day
-        int startTimeInMinutes = startHour * 60 + startMinute;
-        int endTimeInMinutes = endHour * 60 + endMinute;
-        return startTimeInMinutes > endTimeInMinutes;
-    }
-
-    // Save the schedule (this is where you'd handle database saving)
-    private void saveSchedule(int startHour, int startMinute, int endHour, int endMinute) {
-        // Add your database logic here to save the schedule
+        public DeviceSchedule(int startHour, int startMinute, int endHour, int endMinute) {
+            this.startHour = startHour;
+            this.startMinute = startMinute;
+            this.endHour = endHour;
+            this.endMinute = endMinute;
+        }
     }
 }

@@ -9,6 +9,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -25,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // Initialize Firebase Database reference
-        databaseReference = FirebaseDatabase.getInstance().getReference("devices");
+        databaseReference = FirebaseDatabase.getInstance().getReference();
 
         // Initialize UI components
         btnTimerControl = findViewById(R.id.btn_timer_control);
@@ -41,26 +43,26 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Initialize DeviceScheduler and start it
+        // Initialize DeviceScheduler and start checking the schedule
         deviceScheduler = new DeviceScheduler();
-        deviceScheduler.startCheckingSchedule();  // Start checking the schedule
+        deviceScheduler.startCheckingSchedule();
 
-        // Initialize or update device state in Firebase
+        // Initialize or update device and schedule in Firebase
         writeToDatabase();
     }
 
     // Write data to Firebase Realtime Database
     private void writeToDatabase() {
-        // Example data for device state
+        // Example device state data
         Device device = new Device("Light Bulb", "off");
         databaseReference.child("devices").child("device_1").setValue(device);
 
-        // Example data for device schedule
-        DeviceSchedule schedule = new DeviceSchedule(7, 0, 22, 0);  // start at 7:00 AM and end at 10:00 PM
+        // Example schedule data
+        DeviceSchedule schedule = new DeviceSchedule(7, 0, 22, 0); // Start at 7:00 AM and end at 10:00 PM
         databaseReference.child("device_schedule").child("device_1").setValue(schedule);
     }
 
-    // Example schedule class
+    // Example DeviceSchedule class
     public static class DeviceSchedule {
         public int startHour;
         public int startMinute;
@@ -79,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // Example device class
+    // Example Device class
     public static class Device {
         public String name;
         public String state;
@@ -94,22 +96,32 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // Firebase listener for reading real-time data
+    // Read real-time data from Firebase
     private void readFromDatabase() {
-        databaseReference.child("device_1").addValueEventListener(new com.google.firebase.database.ValueEventListener() {
+        databaseReference.child("device_schedule").child("device_1").addValueEventListener(new com.google.firebase.database.ValueEventListener() {
             @Override
-            public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
+            public void onDataChange(DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    Device device = snapshot.getValue(Device.class);
-                    if (device != null) {
-                        // Update UI with the retrieved data
-                        deviceStatus.setText("Device: " + device.name + " | State: " + device.state);
+                    DeviceSchedule schedule = snapshot.getValue(DeviceSchedule.class);
+                    if (schedule != null) {
+                        int startHour = schedule.startHour;
+                        int startMinute = schedule.startMinute;
+                        int endHour = schedule.endHour;
+                        int endMinute = schedule.endMinute;
+
+                        // Update device status TextView or log the schedule
+                        deviceStatus.setText(String.format("Schedule: Start - %02d:%02d, End - %02d:%02d",
+                                startHour, startMinute, endHour, endMinute));
+                    } else {
+                        deviceStatus.setText("No schedule data found.");
                     }
+                } else {
+                    deviceStatus.setText("No data available.");
                 }
             }
 
             @Override
-            public void onCancelled(com.google.firebase.database.DatabaseError error) {
+            public void onCancelled(DatabaseError error) {
                 Toast.makeText(MainActivity.this, "Error reading data", Toast.LENGTH_SHORT).show();
             }
         });

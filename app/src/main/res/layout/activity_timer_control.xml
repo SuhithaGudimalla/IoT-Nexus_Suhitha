@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -5,38 +6,57 @@
     android:padding="16dp"
     android:gravity="center">
 
-    <!-- Start Time Picker -->
-    <TimePicker
-        android:id="@+id/start_time_picker"
-        android:layout_width="wrap_content"
+    <!-- Start Hour -->
+    <EditText
+        android:id="@+id/edt_start_hour"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:timePickerMode="spinner" />
+    android:minHeight="48dp"
+    android:layout_marginBottom="8dp"
+    android:hint="Start Hour (0-23)"
+    android:inputType="number"
+    android:padding="12dp" />  <!-- Add padding for better touch target size -->
 
-    <!-- End Time Picker -->
-    <TimePicker
-        android:id="@+id/end_time_picker"
-        android:layout_width="wrap_content"
+    <!-- Start Minute -->
+    <EditText
+        android:id="@+id/edt_start_minute"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:timePickerMode="spinner" />
+    android:minHeight="48dp"
+    android:layout_marginBottom="8dp"
+    android:hint="Start Minute (0-59)"
+    android:inputType="number"
+    android:padding="12dp" />
 
-    <!-- Button to Submit the Schedule -->
+    <!-- End Hour -->
+    <EditText
+        android:id="@+id/edt_end_hour"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+    android:minHeight="48dp"
+    android:layout_marginBottom="8dp"
+    android:hint="End Hour (0-23)"
+    android:inputType="number"
+    android:padding="12dp" />
+
+    <!-- End Minute -->
+    <EditText
+        android:id="@+id/edt_end_minute"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+    android:minHeight="48dp"
+    android:layout_marginBottom="16dp"
+    android:hint="End Minute (0-59)"
+    android:inputType="number"
+    android:padding="12dp" />
+
+    <!-- Submit Button -->
     <Button
-        android:id="@+id/btn_submit_schedule"
-        android:layout_width="wrap_content"
+        android:id="@+id/btn_submit"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Submit Schedule"
-        android:padding="16dp"
-        android:textSize="16sp"
-        android:layout_marginTop="20dp"/>
-
-    <!-- Error Message TextView (initially invisible) -->
-    <TextView
-        android:id="@+id/error_message"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Start time cannot be later than end time."
-        android:textColor="#FF0000"
-        android:visibility="gone"
-        android:layout_marginTop="10dp"/>
+    android:text="Submit"
+    android:padding="12dp"
+    android:textSize="16sp" />
 
 </LinearLayout>
