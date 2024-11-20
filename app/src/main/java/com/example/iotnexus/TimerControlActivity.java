@@ -8,8 +8,11 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class TimerControlActivity extends AppCompatActivity {
 
@@ -45,17 +48,61 @@ public class TimerControlActivity extends AppCompatActivity {
                 // Create a new DeviceSchedule object
                 DeviceSchedule schedule = new DeviceSchedule(startHour, startMinute, endHour, endMinute);
 
-                // Store the schedule in Firebase under the device ID (e.g., "device_1")
-                databaseReference.child("device_1").setValue(schedule);
+                // Call getNextScheduleKey to get the next available key
+                getNextScheduleKey(new NextScheduleKeyCallback() {
+                    @Override
+                    public void onNextScheduleKeyFetched(String scheduleKey) {
+                        // Store the schedule in Firebase under the device ID (e.g., "device_1")
+                        databaseReference.child("device_1").child(scheduleKey).setValue(schedule);
 
-                // Show success message
-                Toast.makeText(TimerControlActivity.this, "Schedule saved successfully!", Toast.LENGTH_SHORT).show();
+                        // Show success message
+                        Toast.makeText(TimerControlActivity.this, "Schedule saved successfully!", Toast.LENGTH_SHORT).show();
 
-                // Navigate back to MainActivity (Home page)
-                finish();  // This will close the current activity and return to MainActivity
+                        // Navigate back to MainActivity (Home page)
+                        finish();  // This will close the current activity and return to MainActivity
+                    }
+                });
             }
         });
+    }
 
+    // Get the next schedule key (e.g., schedule_1, schedule_2, etc.)
+    private void getNextScheduleKey(final NextScheduleKeyCallback callback) {
+        databaseReference.child("device_1").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                int maxScheduleNumber = 0;
+                for (DataSnapshot scheduleSnapshot : snapshot.getChildren()) {
+                    // Check if the schedule key is in the format schedule_X
+                    if (scheduleSnapshot.getKey() != null && scheduleSnapshot.getKey().startsWith("schedule_")) {
+                        String scheduleKey = scheduleSnapshot.getKey();
+                        try {
+                            int scheduleNumber = Integer.parseInt(scheduleKey.substring("schedule_".length()));
+                            if (scheduleNumber > maxScheduleNumber) {
+                                maxScheduleNumber = scheduleNumber;
+                            }
+                        } catch (NumberFormatException e) {
+                            // Ignore invalid schedule key formats
+                        }
+                    }
+                }
+
+                // Generate the next schedule key
+                String nextScheduleKey = "schedule_" + (maxScheduleNumber + 1);
+                callback.onNextScheduleKeyFetched(nextScheduleKey);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Handle error
+                callback.onNextScheduleKeyFetched("schedule_1");  // If error, default to schedule_1
+            }
+        });
+    }
+
+    // Callback interface for returning the next schedule key
+    interface NextScheduleKeyCallback {
+        void onNextScheduleKeyFetched(String scheduleKey);
     }
 
     // DeviceSchedule class to hold the timer data

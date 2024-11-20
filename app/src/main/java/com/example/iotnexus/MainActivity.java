@@ -34,13 +34,10 @@ public class MainActivity extends AppCompatActivity {
         deviceStatus = findViewById(R.id.device_status);
 
         // Set up click listener for the Timer Control button
-        btnTimerControl.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Start the TimerControlActivity
-                Intent intent = new Intent(MainActivity.this, TimerControlActivity.class);
-                startActivity(intent);
-            }
+        btnTimerControl.setOnClickListener(v -> {
+            // Start the TimerControlActivity
+            Intent intent = new Intent(MainActivity.this, TimerControlActivity.class);
+            startActivity(intent);
         });
 
         // Initialize DeviceScheduler and start checking the schedule
@@ -60,40 +57,6 @@ public class MainActivity extends AppCompatActivity {
         // Example schedule data
         DeviceSchedule schedule = new DeviceSchedule(7, 0, 22, 0); // Start at 7:00 AM and end at 10:00 PM
         databaseReference.child("device_schedule").child("device_1").setValue(schedule);
-    }
-
-    // Example DeviceSchedule class
-    public static class DeviceSchedule {
-        public int startHour;
-        public int startMinute;
-        public int endHour;
-        public int endMinute;
-
-        public DeviceSchedule() {
-            // Default constructor required for Firebase
-        }
-
-        public DeviceSchedule(int startHour, int startMinute, int endHour, int endMinute) {
-            this.startHour = startHour;
-            this.startMinute = startMinute;
-            this.endHour = endHour;
-            this.endMinute = endMinute;
-        }
-    }
-
-    // Example Device class
-    public static class Device {
-        public String name;
-        public String state;
-
-        public Device() {
-            // Default constructor required for Firebase
-        }
-
-        public Device(String name, String state) {
-            this.name = name;
-            this.state = state;
-        }
     }
 
     // Read real-time data from Firebase
