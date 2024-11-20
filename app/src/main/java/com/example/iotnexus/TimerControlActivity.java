@@ -1,6 +1,7 @@
 package com.example.iotnexus;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,6 +14,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.Calendar;
 
 public class TimerControlActivity extends AppCompatActivity {
 
@@ -45,82 +48,115 @@ public class TimerControlActivity extends AppCompatActivity {
                 int endHour = Integer.parseInt(edtEndHour.getText().toString());
                 int endMinute = Integer.parseInt(edtEndMinute.getText().toString());
 
-                // Create a new DeviceSchedule object
-                DeviceSchedule schedule = new DeviceSchedule(startHour, startMinute, endHour, endMinute);
+                // Create a new DeviceSchedule object with state "ON"
+                DeviceSchedule schedule = new DeviceSchedule(startHour, startMinute, endHour, endMinute, "ON");
 
-                // Call getNextScheduleKey to get the next available key
-                getNextScheduleKey(new NextScheduleKeyCallback() {
+                // Get schedule count and generate a unique schedule key
+                getNextScheduleKey(new ScheduleKeyCallback() {
                     @Override
-                    public void onNextScheduleKeyFetched(String scheduleKey) {
-                        // Store the schedule in Firebase under the device ID (e.g., "device_1")
+                    public void onKeyReady(String scheduleKey) {
+                        // Store the schedule in Firebase under device_1
                         databaseReference.child("device_1").child(scheduleKey).setValue(schedule);
 
                         // Show success message
                         Toast.makeText(TimerControlActivity.this, "Schedule saved successfully!", Toast.LENGTH_SHORT).show();
 
+                        // Start state check after submitting
+                        startDeviceStateCheck();
+
                         // Navigate back to MainActivity (Home page)
-                        finish();  // This will close the current activity and return to MainActivity
+                        finish();  // Close current activity and return to MainActivity
                     }
                 });
             }
         });
     }
 
-    // Get the next schedule key (e.g., schedule_1, schedule_2, etc.)
-    private void getNextScheduleKey(final NextScheduleKeyCallback callback) {
+    // Start checking device state based on schedule
+    private void startDeviceStateCheck() {
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                checkAndUpdateDeviceState();
+                handler.postDelayed(this, 60000); // Check every minute
+            }
+        }, 60000);
+    }
+
+    // Check if current time is within any schedule and update the device state
+    private void checkAndUpdateDeviceState() {
+        Calendar now = Calendar.getInstance();
+        int currentHour = now.get(Calendar.HOUR_OF_DAY);
+        int currentMinute = now.get(Calendar.MINUTE);
+
         databaseReference.child("device_1").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                int maxScheduleNumber = 0;
                 for (DataSnapshot scheduleSnapshot : snapshot.getChildren()) {
-                    // Check if the schedule key is in the format schedule_X
-                    if (scheduleSnapshot.getKey() != null && scheduleSnapshot.getKey().startsWith("schedule_")) {
-                        String scheduleKey = scheduleSnapshot.getKey();
-                        try {
-                            int scheduleNumber = Integer.parseInt(scheduleKey.substring("schedule_".length()));
-                            if (scheduleNumber > maxScheduleNumber) {
-                                maxScheduleNumber = scheduleNumber;
-                            }
-                        } catch (NumberFormatException e) {
-                            // Ignore invalid schedule key formats
+                    DeviceSchedule schedule = scheduleSnapshot.getValue(DeviceSchedule.class);  // Get the actual schedule object
+
+                    if (schedule != null) {
+                        // Check if current time is within the schedule
+                        boolean isInTimePeriod = (currentHour > schedule.startHour || (currentHour == schedule.startHour && currentMinute >= schedule.startMinute)) &&
+                                (currentHour < schedule.endHour || (currentHour == schedule.endHour && currentMinute <= schedule.endMinute));
+
+                        // Update state based on time check
+                        if (isInTimePeriod) {
+                            schedule.state = "ON"; // Set state to ON if within schedule
+                        } else {
+                            schedule.state = "OFF"; // Set state to OFF if outside schedule
                         }
+
+                        // Update Firebase with the new state
+                        databaseReference.child("device_1").child(scheduleSnapshot.getKey()).child("state").setValue(schedule.state);
                     }
                 }
-
-                // Generate the next schedule key
-                String nextScheduleKey = "schedule_" + (maxScheduleNumber + 1);
-                callback.onNextScheduleKeyFetched(nextScheduleKey);
             }
 
             @Override
             public void onCancelled(DatabaseError error) {
                 // Handle error
-                callback.onNextScheduleKeyFetched("schedule_1");  // If error, default to schedule_1
             }
         });
     }
 
-    // Callback interface for returning the next schedule key
-    interface NextScheduleKeyCallback {
-        void onNextScheduleKeyFetched(String scheduleKey);
+    // Get the next schedule key based on the highest existing schedule key
+    private void getNextScheduleKey(final ScheduleKeyCallback callback) {
+        databaseReference.child("device_1").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                int highestScheduleNumber = 0;
+
+                // Iterate through the existing schedules to find the highest schedule number
+                for (DataSnapshot scheduleSnapshot : snapshot.getChildren()) {
+                    String key = scheduleSnapshot.getKey();
+                    if (key != null && key.startsWith("schedule_")) {
+                        try {
+                            int scheduleNumber = Integer.parseInt(key.substring("schedule_".length()));
+                            highestScheduleNumber = Math.max(highestScheduleNumber, scheduleNumber);
+                        } catch (NumberFormatException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+                // Generate the next schedule key
+                String nextScheduleKey = "schedule_" + (highestScheduleNumber + 1);
+
+                // Return the next schedule key using the callback
+                callback.onKeyReady(nextScheduleKey);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Handle error
+            }
+        });
     }
 
-    // DeviceSchedule class to hold the timer data
-    public static class DeviceSchedule {
-        public int startHour;
-        public int startMinute;
-        public int endHour;
-        public int endMinute;
-
-        public DeviceSchedule() {
-            // Default constructor required for Firebase
-        }
-
-        public DeviceSchedule(int startHour, int startMinute, int endHour, int endMinute) {
-            this.startHour = startHour;
-            this.startMinute = startMinute;
-            this.endHour = endHour;
-            this.endMinute = endMinute;
-        }
+    // Define a callback interface for getting the next schedule key
+    interface ScheduleKeyCallback {
+        void onKeyReady(String scheduleKey);
     }
 }

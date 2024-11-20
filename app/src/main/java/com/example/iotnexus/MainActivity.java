@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
         databaseReference.child("devices").child("device_1").setValue(device);
 
         // Example schedule data
-        DeviceSchedule schedule = new DeviceSchedule(7, 0, 22, 0); // Start at 7:00 AM and end at 10:00 PM
+        DeviceSchedule schedule = new DeviceSchedule(7, 0, 22, 0, "ON"); // Pass the state as "ON"
         databaseReference.child("device_schedule").child("device_1").setValue(schedule);
     }
 
