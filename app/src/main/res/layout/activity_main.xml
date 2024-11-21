@@ -1,28 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp"
-    android:gravity="center">
+    android:layout_height="match_parent">
 
-    <!-- Device Status Label -->
-    <TextView
-        android:id="@+id/device_status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Device State: OFF"
-        android:textSize="18sp"
-        android:layout_marginTop="20dp" />
+    <!-- Background Image -->
+    <ImageView
+        android:id="@+id/gif_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        app:srcCompat="@drawable/gid_bg" />
 
-    <!-- Button to open TimerControlActivity -->
-    <Button
-        android:id="@+id/btn_timer_control"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Set Device Schedule"
-        android:padding="16dp"
-        android:textSize="16sp"
-        android:layout_marginTop="20dp" />
+    <!-- Foreground Layout with UI Components -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp">
 
-</LinearLayout>
+        <!-- Device Status Label -->
+
+        <!-- Button to open TimerControlActivity -->
+
+        <TextView
+            android:id="@+id/device_status"
+            android:layout_width="186dp"
+            android:layout_height="50dp"
+            android:text="  Device State: OFF"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.497"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.272" />
+
+        <Button
+            android:id="@+id/btn_timer_control"
+            android:layout_width="267dp"
+            android:layout_height="58dp"
+            android:padding="16dp"
+            android:text="Set Device Schedule"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>

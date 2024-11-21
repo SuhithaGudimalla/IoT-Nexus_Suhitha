@@ -46,6 +46,8 @@ dependencies {
     implementation("com.google.firebase:firebase-database:20.0.5")
     // Import the Firebase BoM
     implementation(platform("com.google.firebase:firebase-bom:33.6.0"))
+    implementation ("com.github.bumptech.glide:glide:4.14.1")
+    annotationProcessor ("com.github.bumptech.glide:compiler:4.14.1")
 
 
     // TODO: Add the dependencies for Firebase products you want to use
